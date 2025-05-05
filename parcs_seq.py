@@ -42,22 +42,6 @@ class Solver:
     def _init_centroids(self):
         return random.sample(self.pixels, self.num_clusters)
 
-    def get_closest_centroids_par(self, centroids):
-        chunk_size = len(self.pixels) // len(self.workers)
-        chunks = [self.pixels[i*chunk_size:(i+1)*chunk_size] for i in range(len(self.workers))]
-        
-        # Distribute remaining pixels
-        remaining = len(self.pixels) % len(self.workers)
-        for i in range(remaining):
-            chunks[i].append(self.pixels[-(i+1)])
-        
-        mapped = []
-        for i in range(len(self.workers)):
-            chunk = chunks[i]
-            mapped.append(self.workers[i].get_closest_centroids(chunk, centroids))
-        
-        return self.myreduce(mapped)
-
     @staticmethod
     @expose
     def get_closest_centroids(pixels_chunk, centroids):
@@ -100,7 +84,7 @@ class Solver:
         centroids = self._init_centroids()
         
         for i in range(self.max_iter):
-            closest = self.get_closest_centroids_par(centroids)
+            closest = self.get_closest_centroids(self.pixels, centroids)
             new_centroids = self._move_centroids(closest, centroids)
             centroids = new_centroids
         
