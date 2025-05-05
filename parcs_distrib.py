@@ -98,6 +98,7 @@ class Solver:
 
         self.read_input()
         centroids = self._init_centroids()
+
         
         for i in range(self.max_iter):
             closest = self.get_closest_centroids_par(centroids)
